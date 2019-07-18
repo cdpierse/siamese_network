@@ -1,19 +1,18 @@
-import os 
-import tensorflow as tf
-from tensorflow.keras.preprocessing.image import load_img, img_to_array, array_to_img
-from tensorflow import keras
+import os
+import sys
+import itertools
+import random 
 import numpy as np
 import pandas as pd
-
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.preprocessing.image import (array_to_img, img_to_array,
+                                                  load_img)
 
 height = 128
 width = 128
 dimension = (width, height)
 
-def read_identities():
-    filedir = os.path.join(os.getcwd(),'data','celeba-dataset')
-    return pd.read_csv(os.path.join(filedir,'identity_CelebA.txt'),delimiter=' ', names=['Filename','identity_no'])
-    
 def load_images():
     _train_img_list = []
     _test_img_list = []
@@ -45,12 +44,13 @@ def load_images():
 
 def normalize(img_array):
     return np.divide(img_array,255.0)
-   
+
+if __name__ == '__main__':
+    pass
 
 
+"""TODO - have to build method to   1) get a random sample of data from the df, 
+                                    2) split the data into two df's of pairs and not pairs
+                                    3) create test and validation set for network based off of these pairs 
 
-# X,y = load_images()
-# X,y = normalize(X), normalize(y)
-# print(X.shape)
-# array_to_img(X[0]).show()
-print(read_identities().head(100))
+"""

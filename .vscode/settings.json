@@ -1,5 +1,7 @@
 {
     "python.pythonPath": "/Users/charlespierse/anaconda3/bin/python",
     "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "editor.quickSuggestionsDelay": 2,
+    "search.maintainFileSearchCache": true
 }

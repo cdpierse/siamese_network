@@ -54,7 +54,11 @@ def construct_final_df(sample_size):
     
     return pairs.sample(frac=1)
 
+def get_pair_list():
+    filepath = os.path.join(os.getcwd(),'data','celeba-dataset','pairs_non_pairs.csv')
+    return pd.read_csv(filepath)
+
 if __name__ == '__main__':
     df = construct_final_df(5000)
     file_path = os.path.join(os.getcwd(),'data','celeba-dataset','pairs_non_pairs.csv')
-    df.to_csv(file_path)
+    df.to_csv(file_path,index= False)

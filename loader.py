@@ -12,8 +12,8 @@ from tensorflow.keras.preprocessing.image import (array_to_img, img_to_array,
                                                   load_img)
 from makepairs import get_pair_list
 
-height = 256
-width = 256
+height = 64
+width = 64
 dimension = (width, height)
 
 pairs_non_pairs = get_pair_list()
@@ -62,13 +62,17 @@ def load_images_to_arrays():
         for file in os.listdir(img_dir):
             if file == pairs_non_pairs.iloc[i].file1:
                 img1 = load_img(os.path.join(img_dir,file),
-                color_mode ='grayscale')
+                color_mode ='grayscale',
+                target_size = dimension)
+                
                 img1 = img_to_array(img1)
                 img1 = normalize(img1)
+                
 
             elif file == pairs_non_pairs.iloc[i].file2:
                 img2 = load_img(os.path.join(img_dir,file),
-                color_mode ='grayscale')
+                color_mode ='grayscale',
+                target_size= dimension)
                 img2 = img_to_array(img2)
                 img2 = normalize(img2)
 
@@ -92,7 +96,7 @@ def load_images_to_arrays():
     print(type(x_train))
     
     save_file = os.path.join(os.getcwd(),'data','train_test_images')
-    np.savez(save_file, x_train= x_train, y_train=y_train,
+    np.savez_compressed(save_file, x_train= x_train, y_train=y_train,
                         x_test= x_test, y_test= y_test)
 
     print(f'len of x_train is {len(x_train)} and len of x_test is {len(x_test)}')

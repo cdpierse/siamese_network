@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import (Conv2D, Dense, Flatten, Lambda,
-                                     MaxPooling2D)
+                                     MaxPooling2D, Dropout)
 from tensorflow.math import abs, subtract
 from tensorflow.keras import Model, Input
 from tensorflow.keras.regularizers import l2 
@@ -45,7 +45,7 @@ def siamese_model(input_shape):
 
     model.add(Conv2D(256,KERNEL_SIZE,activation = 'relu',input_shape = INPUT_SHAPE))
     model.add(MaxPooling2D(pool_size= POOL_SIZE))
-
+    
     model.add(Flatten())
     model.add(Dense(4056,activation='sigmoid'))
 

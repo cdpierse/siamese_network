@@ -16,7 +16,7 @@
 celeba-dataset/
 settings.json
 .vscode
-train_test_images.npz
+
 
 ### macOS ###
 # General

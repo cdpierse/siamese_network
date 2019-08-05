@@ -1,7 +1,8 @@
 {
-    "python.pythonPath": "/Users/charlespierse/anaconda3/bin/python",
+    "python.pythonPath": "/anaconda3/envs/siamese_network/bin/python",
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
     "editor.quickSuggestionsDelay": 2,
-    "search.maintainFileSearchCache": true
+    "search.maintainFileSearchCache": true,
+    "python.linting.pylintEnabled": false
 }

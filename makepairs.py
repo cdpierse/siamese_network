@@ -49,7 +49,7 @@ def construct_final_df(sample_size):
     random.shuffle(indices)
     for i in range(len(indices) - 1):
         if df.identity_no.iloc[indices[i]] != df.identity_no.iloc[indices[i + 1]] and len(pairs) < pair_length * 2:
-            pairs = pairs.append({'file1':df.Filename.iloc[indices[i]],'file2':df.Filename.iloc[indices[i + 1]],'match':'No'},
+            pairs = pairs.append({'file1': df.Filename.iloc[indices[i]],'file2':df.Filename.iloc[indices[i + 1]],'match':'No'},
             ignore_index= True)
     
     return pairs.sample(frac=1)

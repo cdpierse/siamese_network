@@ -71,5 +71,4 @@ def fit_model():
     model.fit([x_train[:, 0], x_train[:, 1]], y_train, epochs=10, batch_size=64, validation_split=0.05)
 
 
-#fetch_training_data()
 fit_model()

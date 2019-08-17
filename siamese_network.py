@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Input, Model, Sequential
 from tensorflow.keras.layers import (Conv2D, Dense, Flatten, Lambda,
-                                     MaxPooling2D)
+                                     MaxPooling2D, Dropout)
 from tensorflow.keras.regularizers import l2
 from tensorflow.math import abs, subtract
 
@@ -27,26 +27,31 @@ def siamese_model(input_shape):
     KERNEL_SIZE = (3, 3)
     INPUT_SHAPE = input_shape  # not correct
 
+    k_reg = 0.0005
+    dropout =  0.4
+
     # declare tensors for two input images to be compared
     left_input = Input(INPUT_SHAPE)
     right_input = Input(INPUT_SHAPE)
 
     print(left_input.shape)
-
-
+  
     # for filters early layers should have less (more abstract) while later layers gain more filters
     model = Sequential()
-    model.add(Conv2D(64, KERNEL_SIZE, activation='relu', input_shape= INPUT_SHAPE))
+    model.add(Conv2D(32, KERNEL_SIZE, activation='relu', input_shape=INPUT_SHAPE,
+                     kernel_regularizer=l2(k_reg), bias_regularizer=l2(0.01)))
     model.add(MaxPooling2D(pool_size=POOL_SIZE))
 
-    model.add(Conv2D(128, KERNEL_SIZE, activation='relu', input_shape= INPUT_SHAPE))
+    model.add(Conv2D(64, KERNEL_SIZE, activation='relu', input_shape=INPUT_SHAPE,
+                     kernel_regularizer=l2(k_reg), bias_regularizer=l2(0.01)))
     model.add(MaxPooling2D(pool_size=POOL_SIZE))
 
-    model.add(Conv2D(256, KERNEL_SIZE, activation='relu', input_shape= INPUT_SHAPE))
-    model.add(MaxPooling2D(pool_size=POOL_SIZE))
+    # model.add(Conv2D(256, KERNEL_SIZE, activation='relu', input_shape=INPUT_SHAPE,
+    #                  kernel_regularizer=l2(k_reg), bias_regularizer=l2(0.01)))
+    # model.add(MaxPooling2D(pool_size=POOL_SIZE))
 
     model.add(Flatten())
-    model.add(Dense(4056, activation='sigmoid'))
+    model.add(Dense(1028, activation='sigmoid', kernel_regularizer=l2(0.001), bias_regularizer=l2(0.01)))
 
     left_image_encoded = model(left_input)
     right_image_encoded = model(right_input)

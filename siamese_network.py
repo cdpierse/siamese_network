@@ -4,17 +4,17 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Input, Model, Sequential
 from tensorflow.keras.layers import (Conv2D, Dense, Flatten, Lambda,
-                                     MaxPooling2D, Dropout)
+                                     MaxPooling2D, Dropout, SpatialDropout2D)
 from tensorflow.keras.regularizers import l2
-from tensorflow.math import abs, subtract
+from keras.backend import abs
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+from sklearn.metrics import accuracy_score
 
 
-def fetch_training_data():
+def fetch_train_test():
     data_loc = os.path.join(os.getcwd(), 'data', 'train_test_images.npz')
     data = np.load(data_loc)
-    x_train, y_train = data['x_train'], data['y_train']
-
-    return x_train, y_train
+    return data
 
 
 def siamese_model(input_shape):
@@ -27,36 +27,34 @@ def siamese_model(input_shape):
     KERNEL_SIZE = (3, 3)
     INPUT_SHAPE = input_shape  # not correct
 
-    k_reg = 0.0005
-    dropout =  0.4
-
     # declare tensors for two input images to be compared
     left_input = Input(INPUT_SHAPE)
     right_input = Input(INPUT_SHAPE)
 
     print(left_input.shape)
-  
+
     # for filters early layers should have less (more abstract) while later layers gain more filters
     model = Sequential()
-    model.add(Conv2D(32, KERNEL_SIZE, activation='relu', input_shape=INPUT_SHAPE,
-                     kernel_regularizer=l2(k_reg), bias_regularizer=l2(0.01)))
+
+    model.add(Conv2D(32, KERNEL_SIZE, activation='relu',
+                     input_shape=INPUT_SHAPE, kernel_regularizer=l2(0.4)))
     model.add(MaxPooling2D(pool_size=POOL_SIZE))
 
-    model.add(Conv2D(64, KERNEL_SIZE, activation='relu', input_shape=INPUT_SHAPE,
-                     kernel_regularizer=l2(k_reg), bias_regularizer=l2(0.01)))
+    model.add(Conv2D(64, KERNEL_SIZE, activation='relu',
+                     kernel_regularizer=l2(0.3)))
     model.add(MaxPooling2D(pool_size=POOL_SIZE))
 
-    # model.add(Conv2D(256, KERNEL_SIZE, activation='relu', input_shape=INPUT_SHAPE,
-    #                  kernel_regularizer=l2(k_reg), bias_regularizer=l2(0.01)))
-    # model.add(MaxPooling2D(pool_size=POOL_SIZE))
+    model.add(Conv2D(128, KERNEL_SIZE, activation='relu',
+                     kernel_regularizer=l2(0.01)))
 
     model.add(Flatten())
-    model.add(Dense(1028, activation='sigmoid', kernel_regularizer=l2(0.001), bias_regularizer=l2(0.01)))
+    model.add(Dropout(0.45))
+    model.add(Dense(2056, activation='sigmoid', kernel_regularizer=l2(0.001)))
 
     left_image_encoded = model(left_input)
     right_image_encoded = model(right_input)
 
-    contrastive_layer = Lambda(lambda tensors: abs(subtract(tensors[0], tensors[1])))
+    contrastive_layer = Lambda(lambda tensors: abs(tensors[0] - tensors[1]))
     distance = contrastive_layer([left_image_encoded, right_image_encoded])
 
     prediction = Dense(1, activation='sigmoid')(distance)
@@ -65,7 +63,8 @@ def siamese_model(input_shape):
 
 
 def fit_model():
-    x_train, y_train = fetch_training_data()
+    train_test_data = fetch_train_test()
+    x_train, y_train = train_test_data['x_train'], train_test_data['y_train']
     input_shape = x_train[0][0].shape
     model = siamese_model(input_shape)
 
@@ -73,7 +72,14 @@ def fit_model():
                   optimizer=tf.keras.optimizers.Adam(0.0001),
                   metrics=['accuracy'])
 
-    model.fit([x_train[:, 0], x_train[:, 1]], y_train, epochs=10, batch_size=64, validation_split=0.05)
+    model.fit([x_train[:, 0], x_train[:, 1]], y_train,
+              epochs=100, batch_size=32, validation_split=0.15)
+
+    x_test, y_test = train_test_data['x_test'], train_test_data['y_test']
+
+    print(model.evaluate([x_test[:, 0], x_test[:, 1]], y_test))
+    print(model.metrics_names)
+    model.save('model.h5')
 
 
 fit_model()

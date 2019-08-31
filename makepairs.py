@@ -43,7 +43,7 @@ def construct_final_df(sample_size):
     then finds all the identity pairs in that df. After that we 
     create another df that's made up of filenames where the idenity
     number is not a match.
-    
+
     Returns:
         [dataframe] -- [dataframe of equal numbers of pairs and non-pairs]
     """

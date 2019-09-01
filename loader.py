@@ -30,7 +30,7 @@ def make_image_sample_folder():
     #     os.makedirs(destination)
 
     # # should delete the current contnets of the directory so they can be loaded with new imgs
-    #shutil.rmtree(destination)
+    # shutil.rmtree(destination)
 
     copy_files = []
 
@@ -66,18 +66,9 @@ def load_images_to_arrays():
         if i % 500 == 0:
             print(f'images added so far is: {i}')
 
-        img1 = load_img(os.path.join(img_dir, pairs_non_pairs.iloc[i].file1),
-                        color_mode='grayscale',
-                        target_size=dimension)
+        img1 = load_image(os.path.join(img_dir, pairs_non_pairs.iloc[i].file1))
 
-        img1 = img_to_array(img1)
-        img1 = normalize(img1)
-
-        img2 = load_img(os.path.join(img_dir, pairs_non_pairs.iloc[i].file2),
-                        color_mode='grayscale',
-                        target_size=dimension)
-        img2 = img_to_array(img2)
-        img2 = normalize(img2)
+        img2 = load_image(os.path.join(img_dir, pairs_non_pairs.iloc[i].file2))
 
         img_tuple = (img1, img2)
 
@@ -102,8 +93,17 @@ def load_images_to_arrays():
     np.savez_compressed(save_file, x_train=x_train, y_train=y_train,
                         x_test=x_test, y_test=y_test)
 
-    print(f'len of x_train is {len(x_train)} and len of x_test is {len(x_test)}')
+    print(
+        f'len of x_train is {len(x_train)} and len of x_test is {len(x_test)}')
 
+
+def load_image(filepath):
+    img = load_img(filepath,
+                   color_mode='grayscale',
+                   target_size=dimension)
+    img = img_to_array(img)
+    img = normalize(img)
+    return img
 
 def convert_targets_to_binary(pairs_non_pairs):
     pairs_non_pairs.loc[pairs_non_pairs['match'] == 'Yes', 'match'] = 1

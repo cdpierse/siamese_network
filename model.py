@@ -94,4 +94,5 @@ def fit_model(lr=None, batch_size=None, val_split=None, epochs=None):
     print(model.metrics_names)
     model.save('model.h5')
 
-fit_model()
+if __name__ == '__main__':
+    fit_model()

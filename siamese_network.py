@@ -62,24 +62,36 @@ def siamese_model(input_shape):
     return Model(inputs=[left_input, right_input], outputs=prediction)
 
 
-def fit_model():
+def fit_model(lr=None, batch_size=None, val_split=None, epochs=None):
+    if lr is None:
+        optimizer = tf.keras.optimizers.Adam(0.0001)
+    else:
+        optimizer = tf.keras.optimizers.Adam(lr)
+    if batch_size is None:
+        batch_size = 32
+
+    if val_split is None:
+        val_split = 0.15
+
+    if epochs is None:
+        epochs = 100
+
     train_test_data = fetch_train_test()
     x_train, y_train = train_test_data['x_train'], train_test_data['y_train']
     input_shape = x_train[0][0].shape
     model = siamese_model(input_shape)
 
     model.compile(loss='binary_crossentropy',
-                  optimizer=tf.keras.optimizers.Adam(0.0001),
+                  optimizer=optimizer,
                   metrics=['accuracy'])
 
     model.fit([x_train[:, 0], x_train[:, 1]], y_train,
-              epochs=100, batch_size=32, validation_split=0.15)
+              epochs=epochs, batch_size=batch_size, validation_split=val_split)
 
     x_test, y_test = train_test_data['x_test'], train_test_data['y_test']
 
     print(model.evaluate([x_test[:, 0], x_test[:, 1]], y_test))
     print(model.metrics_names)
     model.save('model.h5')
-
 
 fit_model()

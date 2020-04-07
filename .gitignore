@@ -1,11 +1,5 @@
-
-# Created by https://www.gitignore.io/api/macos,pycharm,visualstudio,visualstudiocode,jupyternotebooks
-# Edit at https://www.gitignore.io/?templates=macos,pycharm,visualstudio,visualstudiocode,jupyternotebooks
-
-### JupyterNotebooks ###
-# gitignore template for Jupyter Notebooks
-# website: http://jupyter.org/
-
+data
+__pycache__
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 

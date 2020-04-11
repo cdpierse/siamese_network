@@ -1,5 +1,5 @@
 import click
-from utils import get_identities, get_pairs, split_ids
+from utils import get_identities, get_pairs, split_ids, get_unique_ids
 import random
 import numpy as np
 
@@ -22,13 +22,11 @@ def create_train_test_files(split_size):
     # into unique non crossover groups
     # * from there I'll need to work out a way to create an even amount of pairs/non-pairs
     #
-    unique_ids = (get_identities()).identity_num.unique()
-    train_size = round(len(unique_ids) * 0.9)
-    test_size = len(unique_ids) - train_size
-
-    test_ids = np.random.choice(unique_ids, test_size)
-    train_ids = list(set(unique_ids) - set(test_ids))
-    print(train_ids)
+    identity_df = get_identities()
+    unique_ids = get_unique_ids(identity_df)
+    train_ids, test_ids = split_ids(unique_ids, split_size)
+    print(len(train_ids), len(test_ids))
+    print(identity_df[identity_df.identity_num == 2880])
 
 
 if __name__ == "__main__":

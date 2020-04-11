@@ -26,3 +26,4 @@ def split_ids(ids: list, split_size) -> tuple:
     test_ids = np.random.choice(ids, test_size)
     train_ids = list(set(ids) - set(test_ids))
     return train_ids, list(test_ids)
+

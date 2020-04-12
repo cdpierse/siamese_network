@@ -1,7 +1,11 @@
-import os
-import pandas as pd
-import numpy as np
 import itertools
+import os
+
+import numpy as np
+import pandas as pd
+from functools import lru_cache
+import pickle
+from pathlib import Path
 DATA_DIR = os.path.join("data", "celeba-dataset")
 
 
@@ -33,17 +37,36 @@ def make_combinations(filenames: list):
 
 
 def make_pairs(identity_df: pd.DataFrame) -> pd.DataFrame:
+    # create dir if it's not there
+    Path("cache/").mkdir(parents=True, exist_ok=True)
+    filename = 'pairs_cache.pkl'
+    if os.path.exists(os.path.join("cache", "pairs_cache.pkl")):
+        with open(os.path.join("cache", "pairs_cache.pkl"), "rb") as cache:
+            print("using cached result from '%s'" % filename)
+            return pickle.load(cache)
+
     unique_ids = get_unique_ids(identity_df)
     pairs = []
     for id in unique_ids:
         filenames = list(identity_df.filename[identity_df.identity_num == id])
         combinations = make_combinations(filenames)
         pairs.extend(combinations)
-    print(pairs[42])
-        
+
+    with open(os.path.join("cache", "pairs_cache.pkl"), 'wb') as cache:
+        print("saving result to cache '%s'" % filename)
+        pickle.dump(pairs, cache)
+    return pairs
+
 
 def make_non_pairs(identity_df: pd.DataFrame) -> pd.DataFrame:
-    pass
+    # this will be done differently
+    # non_pairs exhaustively will be the set off all combinations
+    # for every filename that is not in the pairs list.
+    unique_ids = get_unique_ids(identity_df)
+    non_pairs = []
+    all_possible_combinations = make_combinations(list(identity_df.filename))
+    print(len(all_possible_combinations))
+
 
 ids = get_identities()
 make_pairs(ids)

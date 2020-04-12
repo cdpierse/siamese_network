@@ -35,10 +35,10 @@ def get_dummy_combination_data():
 
 def test_make_combinations(get_dummy_combination_data):
     combinations = make_combinations(get_dummy_combination_data)
-    # check return type is a list
+    # check return type is a list...
     assert type(combinations) is list
 
-    # containing tuples
+    # that contains tuples
     for element in combinations:
         assert type(element) is tuple
 

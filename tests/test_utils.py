@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from siamese_network.utils import (get_identities, get_unique_ids,
-                                   make_non_pairs, make_pairs, split_ids,
+                                   make_pairs, split_ids,
                                    make_combinations)
 
 
@@ -47,12 +47,7 @@ def test_make_combinations(get_dummy_combination_data):
 
 
 def test_make_pairs(get_identity_df):
-    pair_df = make_pairs(get_identity_df)
-    assert isinstance(pair_df, pd.DataFrame)
-    column_names = ['filename1', 'filename2', 'identity_num']
-    assert column_names == list(pair_df.columns)
-
-
-def test_make_non_pairs(get_identity_df):
-    pass
-
+    pairs = make_pairs(get_identity_df)
+    assert type(pairs) is set
+    for val in pairs:
+        assert type(val) is tuple

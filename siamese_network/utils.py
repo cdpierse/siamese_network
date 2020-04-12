@@ -36,11 +36,11 @@ def make_combinations(filenames: list):
     return list(itertools.combinations(filenames, 2))
 
 
-def make_pairs(identity_df: pd.DataFrame) -> pd.DataFrame:
+def make_pairs(identity_df: pd.DataFrame, overwrite_cache=False) -> pd.DataFrame:
     # create dir if it's not there
     Path("cache/").mkdir(parents=True, exist_ok=True)
     filename = 'pairs_cache.pkl'
-    if os.path.exists(os.path.join("cache", "pairs_cache.pkl")):
+    if os.path.exists(os.path.join("cache", "pairs_cache.pkl")) and not overwrite_cache:
         with open(os.path.join("cache", "pairs_cache.pkl"), "rb") as cache:
             print("using cached result from '%s'" % filename)
             return pickle.load(cache)
@@ -51,22 +51,8 @@ def make_pairs(identity_df: pd.DataFrame) -> pd.DataFrame:
         filenames = list(identity_df.filename[identity_df.identity_num == id])
         combinations = make_combinations(filenames)
         pairs.extend(combinations)
-
+    pairs = set(pairs)
     with open(os.path.join("cache", "pairs_cache.pkl"), 'wb') as cache:
         print("saving result to cache '%s'" % filename)
         pickle.dump(pairs, cache)
     return pairs
-
-
-def make_non_pairs(identity_df: pd.DataFrame) -> pd.DataFrame:
-    # this will be done differently
-    # non_pairs exhaustively will be the set off all combinations
-    # for every filename that is not in the pairs list.
-    unique_ids = get_unique_ids(identity_df)
-    non_pairs = []
-    all_possible_combinations = make_combinations(list(identity_df.filename))
-    print(len(all_possible_combinations))
-
-
-ids = get_identities()
-make_pairs(ids)

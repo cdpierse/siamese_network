@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-
+import itertools
 DATA_DIR = os.path.join("data", "celeba-dataset")
 
 
@@ -27,8 +27,23 @@ def split_ids(ids: list, split_size=0.9) -> tuple:
     train_ids = list(set(ids) - set(test_ids))
     return (train_ids, list(test_ids))
 
+
+def make_combinations(filenames: list):
+    return list(itertools.combinations(filenames, 2))
+
+
 def make_pairs(identity_df: pd.DataFrame) -> pd.DataFrame:
-    return get_identities()
+    unique_ids = get_unique_ids(identity_df)
+    pairs = []
+    for id in unique_ids:
+        filenames = list(identity_df.filename[identity_df.identity_num == id])
+        combinations = make_combinations(filenames)
+        pairs.extend(combinations)
+    print(pairs[42])
+        
 
 def make_non_pairs(identity_df: pd.DataFrame) -> pd.DataFrame:
     pass
+
+ids = get_identities()
+make_pairs(ids)

@@ -69,6 +69,7 @@ def make_pairs(identity_df: pd.DataFrame, overwrite_cache=False, ids=None, name=
         pickle.dump(pairs, cache)
     return pairs
 
+
 def make_pair_split_cache_files():
     celeb_train = CelebA(root='data/', split='train')
     celeb_test = CelebA(root='data/', split='test')
@@ -79,23 +80,26 @@ def make_pair_split_cache_files():
     valid_ids = celeb_valid.identity
 
     id_df = get_identities()
-    make_pairs(id_df, ids=train_ids, name='train')
-    make_pairs(id_df, ids=test_ids, name='test')
-    make_pairs(id_df, ids=valid_ids, name='valid')
+    make_pairs(id_df, ids=train_ids, name='train', overwrite_cache=True)
+    make_pairs(id_df, ids=test_ids, name='test', overwrite_cache=True)
+    make_pairs(id_df, ids=valid_ids, name='valid', overwrite_cache=True)
+
 
 def load_pairs(name=None):
     if name is None:
         filename = 'pairs_cache.pkl'
     else:
         filename = name + '_pairs_cache.pkl'
-    with open(os.path.join("cache", filename), "rb") as cache:
-        print("using cached result from '%s'" % filename)
-        return pickle.load(cache)
+    if os.path.exists(os.path.join("cache", filename)):
+        with open(os.path.join("cache", filename), "rb") as cache:
+            print("using cached result from '%s'" % filename)
+            return pickle.load(cache)
+    else:
+        make_pair_split_cache_files()
 
 
 if __name__ == "__main__":
-    print(len(load_pairs('valid')))
+    vals = load_pairs('valid')
+   
+  
 
-    # print(len(get_unique_ids(valid_ids)))
-    # print(len(get_unique_ids(train_ids)))
-    # print(len(get_unique_ids(test_ids)))

@@ -9,7 +9,7 @@ from siamese_network.utils import load_pairs
 
 class SiameseDataset(CelebA):
 
-    def __init__(self, max_pairs=None, split=None):
+    def __init__(self, root, max_pairs=None, split=None):
         """__init__ [summary]
 
         Args:
@@ -25,7 +25,9 @@ class SiameseDataset(CelebA):
         else:
             self.split = 'all'
 
-        super().__init__(root='data/', split=self.split)
+        self.root = root
+
+        super().__init__(root=self.root, split=self.split)
 
         self.max_pairs = max_pairs
 
@@ -48,30 +50,30 @@ class SiameseDataset(CelebA):
                 raise TypeError(
                     f'The value "{max_pairs}" is not a valid type for max_pairs. Must be of type int.')
 
-        self.pairs = torch.as_tensor(self.pairs)
-
     def __getitem__(self, index):
-        """__getitem__ is overriden
-        from the CelebA dataset to 
-        fetch pairs of images sequentially
+        img0, img1 = self.pairs[self.pair_index]
+        self.pairs_index + 1
 
-        Args:
-            index ([type]): [description]
-        """
-        print('yay overwite ')
+    def __len__(self):
+        # this multiplication by 2 may seem odd
+        # but for every pair (identity match) we will
+        # also provide the network with a non pair
+        # which will be randomly generated, thus the multiplication
 
-    @classmethod
-    def from_train(cls):
-        return cls(split='train')
+        return len(self.pairs) * 2
 
     @classmethod
-    def from_validation(cls):
-        return cls(split='valid')
+    def from_train(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
 
     @classmethod
-    def from_test(cls):
-        return cls(split='test')
+    def from_validation(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
+
+    @classmethod
+    def from_test(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
 
 
-sd = SiameseDataset(max_pairs=100)
+sd = SiameseDataset.from_train('data/', split='test', max_pairs=10)
 print(type(sd.pairs))

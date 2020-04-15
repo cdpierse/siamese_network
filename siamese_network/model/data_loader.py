@@ -1,25 +1,39 @@
+import random
+
 import torch
 from torch.utils.data import DataLoader, Dataset
 from torchvision.datasets import CelebA
+
 from siamese_network.utils import load_pairs
 
 
 class SiameseDataset(CelebA):
 
     def __init__(self, max_pairs=None, split=None):
-        self.split = split
-        if self.split:
-            super().__init__(root='data/', split=self.split)
+        """__init__ [summary]
+
+        Args:
+            max_pairs (int, optional): [description]. Defaults to None.
+            split (str, optional): [description]. Defaults to None.
+
+        Raises:
+            ValueError: [description]
+            TypeError: [description]
+        """
+        if split:
+            self.split = split
         else:
-            super().__init__(root='data/')
+            self.split = 'all'
+
+        super().__init__(root='data/', split=self.split)
 
         self.max_pairs = max_pairs
 
         self.pairs = {}
-        if self.split == 'train':
-            self.pairs = load_pairs('train')
-        elif self.split is None:
+        if self.split == 'all':
             self.pairs = load_pairs()
+        elif self.split == 'train':
+            self.pairs = load_pairs('train')
         elif self.split == 'test':
             self.pairs = load_pairs('test')
         elif self.split == 'valid':
@@ -28,10 +42,13 @@ class SiameseDataset(CelebA):
             raise ValueError(f"Split type {self.split} is not recognized")
 
         if max_pairs:
-            # method to randomly indices of pairs
-            # and choose `max_pairs` amount
-            # from the dataset to be our files
-            pass
+            if isinstance(max_pairs, int):
+                self.pairs = random.sample(self.pairs, max_pairs)
+            else:
+                raise TypeError(
+                    f'The value "{max_pairs}" is not a valid type for max_pairs. Must be of type int.')
+
+        self.pairs = torch.as_tensor(self.pairs)
 
     def __getitem__(self, index):
         """__getitem__ is overriden
@@ -44,12 +61,8 @@ class SiameseDataset(CelebA):
         print('yay overwite ')
 
     @classmethod
-    def shuffle(cls):
-        pass
-
-    @classmethod
-    def get_test_dataset(cls):
-        pass
+    def from_train(cls):
+        return cls(split='train')
 
     @classmethod
     def from_validation(cls):
@@ -60,7 +73,5 @@ class SiameseDataset(CelebA):
         return cls(split='test')
 
 
-sd = SiameseDataset(split='train')
-for pair in sd.pairs:
-    print(pair)
-    break
+sd = SiameseDataset(max_pairs=100)
+print(type(sd.pairs))
